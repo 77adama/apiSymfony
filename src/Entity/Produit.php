@@ -7,6 +7,9 @@ use App\Repository\ProduitRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
+#[ORM\InheritanceType("JOINED")]
+#[ORM\DiscriminatorColumn(name:"type", type:"string")]
+#[ORM\DiscriminatorMap(["menu"=>"Menu","complement" => "Complement","burger"=>"Burger" ])]
 #[ApiResource(
     collectionOperations:["get","post"],
     itemOperations:["put","get"]
@@ -16,19 +19,19 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    protected $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $nom;
+    protected $nom;
 
     #[ORM\Column(type: 'float')]
-    private $prix;
+    protected $prix;
 
     #[ORM\Column(type: 'boolean')]
-    private $isEtat;
+    protected $isEtat;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $type;
+    // #[ORM\Column(type: 'string', length: 255)]
+    // private $type;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
     private $gestionnaire;
