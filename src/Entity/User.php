@@ -27,61 +27,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-      /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     *
-     * @Groups("user:read")
-     */
+    
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     *
-     * @Groups({"user:read", "user:write"})
-     */
+  
     protected $email;
 
     #[ORM\Column(type: 'json')]
-        /**
-     * @ORM\Column(type="json")
-     *
-     * @Groups("user:read")
-     */
+     
     protected $roles = [];
 
     #[ORM\Column(type: 'string')]
-    /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
-     */
+   
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255)]
-    /**
-     * @ORM\Column(type="string", length=255)
-     *
-     * @Groups({"user:read", "user:write"})
-     */
+   
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
-        /**
-     * @ORM\Column(type="string", length=255)
-     *
-     * @Groups({"user:read", "user:write"})
-     */
+    
     protected $prenom;
 
     
-       /**
-     * @Groups("user:write")
-     * 
-     * @SerializedName("password")
-     */
-    private $plainPassword;
+     
+    #[SerializedName("password")]
+    protected $plainPassword;
 
     public function getId(): ?int
     {
