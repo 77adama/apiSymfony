@@ -19,6 +19,7 @@ class Gestionnaire extends User
 
 
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
+    #[ApiSubresource]
     private $produits;
 
     public function __construct()
