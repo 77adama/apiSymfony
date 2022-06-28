@@ -22,8 +22,11 @@ class Zone
     #[ORM\Column(type: 'string', length: 255)]
     private $nom_zone;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $prix_livraison;
+    #[ORM\Column(type: 'float')]
+    private $prix_livr;
+
+    // #[ORM\Column(type: 'string', length: 255)]
+    // private $prix_livraison;
 
     public function getId(): ?int
     {
@@ -42,14 +45,26 @@ class Zone
         return $this;
     }
 
-    public function getPrixLivraison(): ?string
+    // public function getPrixLivraison(): ?string
+    // {
+    //     return $this->prix_livraison;
+    // }
+
+    // public function setPrixLivraison(string $prix_livraison): self
+    // {
+    //     $this->prix_livraison = $prix_livraison;
+
+    //     return $this;
+    // }
+
+    public function getPrixLivr(): ?float
     {
-        return $this->prix_livraison;
+        return $this->prix_livr;
     }
 
-    public function setPrixLivraison(string $prix_livraison): self
+    public function setPrixLivr(float $prix_livr): self
     {
-        $this->prix_livraison = $prix_livraison;
+        $this->prix_livr = $prix_livr;
 
         return $this;
     }

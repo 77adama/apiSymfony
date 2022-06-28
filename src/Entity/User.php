@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\Controller\ValideEmail;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
@@ -14,46 +17,89 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"role", type:"string")]
 #[ORM\DiscriminatorMap(["gestionnaaire"=>"Gestionnaire","client" => "Client","livreur"=>"Livreur" ])]
-/**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- *
- * @ApiResource(
- * normalizationContext={"groups"={"user:read"}},
- * denormalizationContext={"groups"={"user:write"}}
- * )
- */
+// /**
+//  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+//  *
+//  * @ApiResource(
+//  * normalizationContext={"groups"={"user:read"}},
+//  * denormalizationContext={"groups"={"user:write"}}
+//  * )
+//  */
+#[ApiResource(
+    collectionOperations:[
+        // "get",
+        // "post_register" => [
+        // "method"=>"post",
+        // 'path'=>'/register', 
+        // 'normalization_context' => ['groups' => ['user:read:simple']],
+       
+        // ],
+        // "post" => [
+        //     'normalization_context' => ['groups' => ['produit:read:all']],
+        //     ],
+        // "token" => [
+        //     'method' => 'patch',
+        //     "path"=>"user/validate/{token}",
+        //     "controller"=>ValideEmail::class,
+        //     "deserialize"=>false
+        //     ]   
+        ],
+        
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["produit:read:all",'write'])]
+    // #[Groups(["produit:read:all",'write',"user:read:simple","produit:read:simple"])]
+    #[Groups(["produit:read:simple","boisson:read:simple","fritte:read:simple"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(["produit:read:all"])]
+    // #[Groups(["produit:read:all","user:read:simple","produit:read:simple","write_"])]
+    #[Groups(["produit:read:simple","boisson:read:simple","fritte:read:simple"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
-     
+    // #[Groups(["write_"])]
     protected $roles = [];
 
     #[ORM\Column(type: 'string')]
    
+    // #[Groups(["write_"])]
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255)]
-   
+    // #[Groups(["produit:read:simple","write_"])]
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
-    
+    // #[Groups(["produit:read:simple","write_"])]
     protected $prenom;
 
     
      
     #[SerializedName("password")]
     protected $plainPassword;
+
+    // #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
+    // private $produits;
+
+    #[ORM\Column(type: 'datetime')]
+    private $expireAt;
+
+    #[ORM\Column(type: 'boolean')]
+    private $isEnable=false;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $token;
+
+    public function __construct()
+    {
+        $this->produits = new ArrayCollection();
+        $this->expireAt= new \DateTime("+1 day");
+        $this->token=str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(random_bytes(128)));
+    }
 
     public function getId(): ?int
     {
@@ -157,6 +203,72 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    // /**
+    //  * @return Collection<int, Produit>
+    //  */
+    // public function getProduits(): Collection
+    // {
+    //     return $this->produits;
+    // }
+
+    // public function addProduit(Produit $produit): self
+    // {
+    //     if (!$this->produits->contains($produit)) {
+    //         $this->produits[] = $produit;
+    //         $produit->setUser($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeProduit(Produit $produit): self
+    // {
+    //     if ($this->produits->removeElement($produit)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($produit->getUser() === $this) {
+    //             $produit->setUser(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
+    public function getExpireAt(): ?\DateTimeInterface
+    {
+        return $this->expireAt;
+    }
+
+    public function setExpireAt(\DateTimeInterface $expireAt): self
+    {
+        $this->expireAt = $expireAt;
+
+        return $this;
+    }
+
+    public function isIsEnable(): ?bool
+    {
+        return $this->isEnable;
+    }
+
+    public function setIsEnable(bool $isEnable): self
+    {
+        $this->isEnable = $isEnable;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }

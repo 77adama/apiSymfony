@@ -19,10 +19,13 @@ class UserDataPersister implements ContextAwareDataPersisterInterface
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $encoder) {
+        UserPasswordHasherInterface $encoder,
+        MailerService $mailerService
+        
+        ) {
         $this->entityManager = $entityManager;
         $this->encoder = $encoder;
-       
+        $this->mailerService = $mailerService;   
         
     }
 
@@ -45,6 +48,7 @@ class UserDataPersister implements ContextAwareDataPersisterInterface
            $data->eraseCredentials();
             $this->entityManager->persist($data);
             $this->entityManager->flush();
+            $this->mailerService->sendEmail($data);
         }
 
     }

@@ -12,11 +12,22 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *
  * @ApiResource
  */
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post" => [
+       
+        'denormalization_context' => ['groups' => ['write_']],
+        ]
+        ],
+        
+)]
 class Client extends User
 {
 
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["write_"])]
     private $telephone;
 
     public function getTelephone(): ?string

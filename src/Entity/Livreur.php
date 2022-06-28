@@ -19,6 +19,7 @@ class Livreur extends User
     #[ORM\Column(type: 'string', length: 255)]
     private $matricule;
 
+
     public function getId(): ?int
     {
         return $this->id;
@@ -35,4 +36,6 @@ class Livreur extends User
 
         return $this;
     }
+
+
 }

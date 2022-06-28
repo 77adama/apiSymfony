@@ -2,35 +2,49 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\GestionnaireRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\GestionnaireRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
-/**
- * @ORM\Entity(repositoryClass="App\Repository\GestionnaireRepository")
- *
- * @ApiResource
- */
+// /**
+//  * @ORM\Entity(repositoryClass="App\Repository\GestionnaireRepository")
+//  *
+//  * @ApiResource
+//  */
+#[ApiResource(
+    collectionOperations:[
+    ],
+)]
+
 class Gestionnaire extends User
 {
 
 
+
+
+ 
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
-    #[ApiSubresource]
     private $produits;
+
+    // #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
+    // #[ApiSubresource]
+    // #[Groups(["produit:read:all"])]
+    // private $produits;
+
+
 
     public function __construct()
     {
-        $this->produits = new ArrayCollection();
+        parent::__construct();
+        // $this->produits = new ArrayCollection();
+        // $this->burgers = new ArrayCollection();
+        
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     /**
      * @return Collection<int, Produit>
