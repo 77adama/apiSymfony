@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\FritteRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\FrittePortionRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: FritteRepository::class)]
+#[ORM\Entity(repositoryClass: FrittePortionRepository::class)]
 #[ApiResource(
     collectionOperations:[
 
@@ -33,34 +34,52 @@ use Doctrine\ORM\Mapping as ORM;
                 'normalization_context' => ['groups' => ['fritte:read:simple']],
                 ]]
 )]
-class Fritte extends Complement
+class FrittePortion extends Produit
 {
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'fritte')]
-    private $menus;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["write_fritte","fritte:read:simple"])]
+    private $portionnss;
+
+    #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'frittePortions')]
+    private $menu;
+
+    
+
+
 
     public function __construct()
     {
-        $this->menus = new ArrayCollection();
+        parent::__construct();
+        $this->menu = new ArrayCollection();
     }
 
-    // #[ORM\Column(type: 'string', length: 255)]
-    // #[Groups(["fritte:read:simple","write_fritte"])]
-    // private $diff_frit;
+
+    public function getPortionnss(): ?string
+    {
+        return $this->portionnss;
+    }
+
+    public function setPortionnss(string $portionnss): self
+    {
+        $this->portionnss = $portionnss;
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Menu>
      */
-    public function getMenus(): Collection
+    public function getMenu(): Collection
     {
-        return $this->menus;
+        return $this->menu;
     }
 
     public function addMenu(Menu $menu): self
     {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addFritte($this);
+        if (!$this->menu->contains($menu)) {
+            $this->menu[] = $menu;
         }
 
         return $this;
@@ -68,12 +87,9 @@ class Fritte extends Complement
 
     public function removeMenu(Menu $menu): self
     {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeFritte($this);
-        }
+        $this->menu->removeElement($menu);
 
         return $this;
     }
-
-
+    
 }

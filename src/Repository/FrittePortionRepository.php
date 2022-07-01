@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Fritte;
+use App\Entity\FrittePortion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Fritte>
+ * @extends ServiceEntityRepository<FrittePortion>
  *
- * @method Fritte|null find($id, $lockMode = null, $lockVersion = null)
- * @method Fritte|null findOneBy(array $criteria, array $orderBy = null)
- * @method Fritte[]    findAll()
- * @method Fritte[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method FrittePortion|null find($id, $lockMode = null, $lockVersion = null)
+ * @method FrittePortion|null findOneBy(array $criteria, array $orderBy = null)
+ * @method FrittePortion[]    findAll()
+ * @method FrittePortion[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class FritteRepository extends ServiceEntityRepository
+class FrittePortionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Fritte::class);
+        parent::__construct($registry, FrittePortion::class);
     }
 
-    public function add(Fritte $entity, bool $flush = false): void
+    public function add(FrittePortion $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class FritteRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Fritte $entity, bool $flush = false): void
+    public function remove(FrittePortion $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class FritteRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Fritte[] Returns an array of Fritte objects
+//     * @return FrittePortion[] Returns an array of FrittePortion objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class FritteRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Fritte
+//    public function findOneBySomeField($value): ?FrittePortion
 //    {
 //        return $this->createQueryBuilder('f')
 //            ->andWhere('f.exampleField = :val')

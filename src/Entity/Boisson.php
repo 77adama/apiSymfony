@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations:[
 
         "post" => [
-            // 'denormalization_context' => ['groups' => ['write_boisson']],
+            'denormalization_context' => ['groups' => ['write_boisson']],
             // 'normalization_context' => ['groups' => ['produit:read:all']],
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
@@ -34,26 +34,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'normalization_context' => ['groups' => ['boisson:read:simple']],
                 ]]
 )]
-class Boisson  extends  Complement
+class Boisson  extends Produit
 {
 
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write_boisson","boisson:read:simple"])]
+    #[Groups(["write_boisson","boisson:read:simple","menu:read:simple"])]
     private $taille;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'boissons')]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'boisson')]
     private $menu;
+
+    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: Menu::class)]
+    private $menus;
+
 
     public function __construct()
     {
-        $this->menu = new ArrayCollection();
+        $this->menus = new ArrayCollection();
     }
 
 
-
-    // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'boisson')]
-    // private $menu;
 
 
 
@@ -70,30 +71,31 @@ class Boisson  extends  Complement
         return $this;
     }
 
-    // public function getMenu(): ?Menu
-    // {
-    //     return $this->menu;
-    // }
-
-    // public function setMenu(?Menu $menu): self
-    // {
-    //     $this->menu = $menu;
-
-    //     return $this;
-    // }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenu(): Collection
+    public function getMenu(): ?Menu
     {
         return $this->menu;
     }
 
+    public function setMenu(?Menu $menu): self
+    {
+        $this->menu = $menu;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Menu>
+     */
+    public function getMenus(): Collection
+    {
+        return $this->menus;
+    }
+
     public function addMenu(Menu $menu): self
     {
-        if (!$this->menu->contains($menu)) {
-            $this->menu[] = $menu;
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+            $menu->setBoisson($this);
         }
 
         return $this;
@@ -101,9 +103,16 @@ class Boisson  extends  Complement
 
     public function removeMenu(Menu $menu): self
     {
-        $this->menu->removeElement($menu);
+        if ($this->menus->removeElement($menu)) {
+            // set the owning side to null (unless already changed)
+            if ($menu->getBoisson() === $this) {
+                $menu->setBoisson(null);
+            }
+        }
 
         return $this;
     }
-    
+
+   
+
 }

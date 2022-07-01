@@ -2,25 +2,65 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\MenuRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Burger;
+use App\Entity\Boisson;
+use App\Entity\FrittePortion;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MenuRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+
+        "post" => [
+            //'denormalization_context' => ['groups' => ['write_menu']],
+            // 'normalization_context' => ['groups' => ['produit:read:all']],
+            "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            ],
+            // "get" => [
+            //     'normalization_context' => ['groups' => ['produit:read:all']],
+            //     ],
+            ],
+            itemOperations:[
+                "put"=>[
+                "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+                "security_message"=>"Vous n'avez pas access à cette Ressource",
+            ],
+            "get"=>[
+                // 'method' => 'get',
+                // 'status' => Response::HTTP_OK,
+               // 'normalization_context' => ['groups' => ['menu:read:simple']],
+                ]]
+)]
 class Menu extends Produit
 {
    
-    #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'menu')]
-    private $boissons;
+    // #[ORM\ManyToMany(targetEntity: Boisson::class, mappedBy: 'menu')]
+    // #[Groups(["menu:read:simple"])]
+    // private $boissons;
 
-    #[ORM\ManyToMany(targetEntity: Fritte::class, inversedBy: 'menus')]
-    private $fritte;
+
 
     #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
+   // #[Groups(["menu:read:simple","write_menu"])]
     private $burger;
+
+    #[ORM\ManyToMany(targetEntity: FrittePortion::class, mappedBy: 'menu')]
+   // #[Groups(["menu:read:simple","write_menu"])]
+    private $frittePortions;
+
+    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'menus')]
+    private $boisson;
+
+    
+
+
+    
 
     
 
@@ -28,62 +68,12 @@ class Menu extends Produit
 
     public function __construct()
     {
-        $this->fritte = new ArrayCollection();
-        $this->boissons = new ArrayCollection();
+        // $this->boissons = new ArrayCollection();
         $this->burger = new ArrayCollection();
+        $this->frittePortions = new ArrayCollection();
+
     }
 
-
-    /**
-     * @return Collection<int, Boisson>
-     */
-    public function getBoissons(): Collection
-    {
-        return $this->boissons;
-    }
-
-    public function addBoisson(Boisson $boisson): self
-    {
-        if (!$this->boissons->contains($boisson)) {
-            $this->boissons[] = $boisson;
-            $boisson->addMenu($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoisson(Boisson $boisson): self
-    {
-        if ($this->boissons->removeElement($boisson)) {
-            $boisson->removeMenu($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Fritte>
-     */
-    public function getFritte(): Collection
-    {
-        return $this->fritte;
-    }
-
-    public function addFritte(Fritte $fritte): self
-    {
-        if (!$this->fritte->contains($fritte)) {
-            $this->fritte[] = $fritte;
-        }
-
-        return $this;
-    }
-
-    public function removeFritte(Fritte $fritte): self
-    {
-        $this->fritte->removeElement($fritte);
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Burger>
@@ -109,4 +99,70 @@ class Menu extends Produit
         return $this;
     }
 
+    /**
+     * @return Collection<int, FrittePortion>
+     */
+    public function getFrittePortions(): Collection
+    {
+        return $this->frittePortions;
+    }
+
+    public function addFrittePortion(FrittePortion $frittePortion): self
+    {
+        if (!$this->frittePortions->contains($frittePortion)) {
+            $this->frittePortions[] = $frittePortion;
+            $frittePortion->addMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFrittePortion(FrittePortion $frittePortion): self
+    {
+        if ($this->frittePortions->removeElement($frittePortion)) {
+            $frittePortion->removeMenu($this);
+        }
+
+        return $this;
+    }
+
+    //  public function totalBurger()
+    // {
+    //     return array_reduce($this->burgers->toArray(), function($totalBurger, $burger){
+    //             return $totalBurger + $burger->getPrix();
+    //     },0);
+    // }
+    // public function totalBoisson()
+    // {
+    //     return array_reduce($this->boissons->toArray(), function ($totalBoisson, $boisson){
+    //             return $totalBoisson + $boisson->getPrix();
+    //     },0);
+    // }
+    // public function totalFrittePortion()
+    // {
+    //     return array_reduce($this->frittes->toArray(), function ($totalFrittePortion, $frittePortion){
+    //             return $totalFrittePortion + $frittePortion->getPrix();
+    //     },0);
+    // }
+
+    // public function getPriceMenu()
+    // {
+    //     // array_reduce($this->burgers->toArray()), function ($totalBurger )
+    //     return $this->totalBoisson() + $this->totalBurger() + $this->totalFrittePortion();
+
+    // }
+
+    public function getBoisson(): ?Boisson
+    {
+        return $this->boisson;
+    }
+
+    public function setBoisson(?Boisson $boisson): self
+    {
+        $this->boisson = $boisson;
+
+        return $this;
+    }
+
+   
 }

@@ -20,8 +20,8 @@ class Livraison
     #[ORM\Column(type: 'boolean')]
     private $etat_livraison;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private $dateAt;
+    #[ORM\Column(type: 'datetime')]
+    private $DateAt;
 
 
     public function __construct()
@@ -46,19 +46,17 @@ class Livraison
         return $this;
     }
 
-    public function getDateAt(): ?\DateTimeImmutable
+    public function getDateAt(): ?\DateTimeInterface
     {
-        return $this->dateAt;
+        return $this->DateAt;
     }
 
-    public function setDateAt(\DateTimeImmutable $dateAt): self
+    public function setDateAt(\DateTimeInterface $DateAt): self
     {
-        $this->dateAt = $dateAt;
+        $this->DateAt = $DateAt;
 
         return $this;
     }
-
-   
 
    
 }

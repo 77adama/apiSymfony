@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\ProduitController;
 use App\Repository\ProduitRepository;
@@ -13,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"type", type:"string")]
-#[ORM\DiscriminatorMap(["menu"=>"Menu","complement" => "Complement","burger"=>"Burger" ])]
+#[ORM\DiscriminatorMap(["menu"=>"Menu","burger"=>"Burger","boisson"=>"Boisson","frittePortion" => "FrittePortion"])]
 #[ApiResource(
     collectionOperations:[
         // "get"=>[
@@ -27,11 +29,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             //     "security_message"=>"Vous n'avez pas access à cette Ressource",
             //     ],
-        //   "add" => [
-        //         'method' => 'Post',
-        //         "path"=>"/add",
-        //         "controller"=>ProduitController::class,
-        //         ]   
+          "add" => [
+                'method' => 'Post',
+                "path"=>"/add",
+                "controller"=>ProduitController::class,
+                ]   
             ],
     // itemOperations:[
     // //     "put"=>[
@@ -49,18 +51,22 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    //#[Groups(["write_menu"])]
     // #[Groups(["produit:read:simple","produit:read:all"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 255)]
     // #[Groups(["produit:read:simple","produit:read:all","write"])]
-    #[Groups(["write","produit:read:simple","write_boisson","boisson:read:simple","write_fritte","fritte:read:simple"])]
+    #[Groups(["write","produit:read:simple","write_boisson",
+    "boisson:read:simple","write_fritte","fritte:read:simple",
+    "menu:read:simple","menu:read:simple"])]
     #[Assert\NotBlank(message:"Le nom est Obligatoire")]
     protected $nom;
 
     #[ORM\Column(type: 'float')]
     // #[Groups(["produit:read:simple","produit:read:all","write"])]
-    #[Groups(["produit:read:simple","write_boisson","write_fritte","fritte:read:simple"])]
+    #[Groups(["produit:read:simple","write_boisson","write_fritte",
+    "fritte:read:simple","menu:read:simple"])]
     #[Assert\NotBlank(message:"Le prix est Obligatoire")]
     protected $prix;
 
@@ -71,6 +77,15 @@ class Produit
     // #[Groups(["produit:read:simple","produit:read:all","write"])]
     #[Groups(["write","produit:read:simple","boisson:read:simple","fritte:read:simple"])]
     protected $gestionnaire;
+
+ 
+    #[ORM\ManyToOne(targetEntity: LigneCommande::class, inversedBy: 'produit')]
+    protected $ligneCommande;
+
+    public function __construct()
+    {
+        $this->ligneCommandes = new ArrayCollection();
+    }
 
     
     // #[ORM\Column(type: 'string', length: 255)]
@@ -127,6 +142,19 @@ class Produit
     public function setGestionnaire(?Gestionnaire $gestionnaire): self
     {
         $this->gestionnaire = $gestionnaire;
+
+        return $this;
+    }
+
+
+    public function getLigneCommande(): ?LigneCommande
+    {
+        return $this->ligneCommande;
+    }
+
+    public function setLigneCommande(?LigneCommande $ligneCommande): self
+    {
+        $this->ligneCommande = $ligneCommande;
 
         return $this;
     }

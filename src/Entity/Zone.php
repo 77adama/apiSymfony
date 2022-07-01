@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ZoneRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
@@ -24,6 +26,17 @@ class Zone
 
     #[ORM\Column(type: 'float')]
     private $prix_livr;
+
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]
+    private $quartier;
+
+    #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'zones')]
+    private $gestionnaire;
+
+    public function __construct()
+    {
+        $this->quartier = new ArrayCollection();
+    }
 
     // #[ORM\Column(type: 'string', length: 255)]
     // private $prix_livraison;
@@ -65,6 +78,48 @@ class Zone
     public function setPrixLivr(float $prix_livr): self
     {
         $this->prix_livr = $prix_livr;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Quartier>
+     */
+    public function getQuartier(): Collection
+    {
+        return $this->quartier;
+    }
+
+    public function addQuartier(Quartier $quartier): self
+    {
+        if (!$this->quartier->contains($quartier)) {
+            $this->quartier[] = $quartier;
+            $quartier->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuartier(Quartier $quartier): self
+    {
+        if ($this->quartier->removeElement($quartier)) {
+            // set the owning side to null (unless already changed)
+            if ($quartier->getZone() === $this) {
+                $quartier->setZone(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getGestionnaire(): ?Gestionnaire
+    {
+        return $this->gestionnaire;
+    }
+
+    public function setGestionnaire(?Gestionnaire $gestionnaire): self
+    {
+        $this->gestionnaire = $gestionnaire;
 
         return $this;
     }
