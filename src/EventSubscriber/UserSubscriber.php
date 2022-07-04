@@ -2,7 +2,9 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Zone;
 use App\Entity\Produit;
+use App\Entity\Quartier;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,7 +38,8 @@ class UserSubscriber implements EventSubscriberInterface
         }
         public function prePersist(LifecycleEventArgs $args)
         {
-        if ($args->getObject() instanceof Produit) {
+        if ($args->getObject() instanceof Produit or $args->getObject() instanceof Zone
+        or $args->getObject() instanceof Quartier) {
         $args->getObject()->setGestionnaire($this->getUser());
         }
         }

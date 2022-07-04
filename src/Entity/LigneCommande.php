@@ -23,6 +23,12 @@ class LigneCommande
     #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)]
     private $produit;
 
+    #[ORM\Column(type: 'float')]
+    private $nbreProduit;
+
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ligneCommande')]
+    private $commande;
+
 
 
     public function __construct()
@@ -74,6 +80,30 @@ class LigneCommande
                 $produit->setLigneCommande(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNbreProduit(): ?float
+    {
+        return $this->nbreProduit;
+    }
+
+    public function setNbreProduit(float $nbreProduit): self
+    {
+        $this->nbreProduit = $nbreProduit;
+
+        return $this;
+    }
+
+    public function getCommande(): ?Commande
+    {
+        return $this->commande;
+    }
+
+    public function setCommande(?Commande $commande): self
+    {
+        $this->commande = $commande;
 
         return $this;
     }

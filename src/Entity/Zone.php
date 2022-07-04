@@ -33,9 +33,13 @@ class Zone
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'zones')]
     private $gestionnaire;
 
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]
+    private $commandes;
+
     public function __construct()
     {
         $this->quartier = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
     }
 
     // #[ORM\Column(type: 'string', length: 255)]
@@ -120,6 +124,36 @@ class Zone
     public function setGestionnaire(?Gestionnaire $gestionnaire): self
     {
         $this->gestionnaire = $gestionnaire;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes[] = $commande;
+            $commande->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getZone() === $this) {
+                $commande->setZone(null);
+            }
+        }
 
         return $this;
     }
