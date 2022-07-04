@@ -28,6 +28,7 @@ class Gestionnaire extends User
 
  
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
+    #[ApiSubresource]
     private $produits;
 
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Zone::class)]

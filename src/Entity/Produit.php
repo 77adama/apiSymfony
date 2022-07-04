@@ -18,11 +18,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\DiscriminatorMap(["menu"=>"Menu","burger"=>"Burger","boisson"=>"Boisson","frittePortion" => "FrittePortion"])]
 #[ApiResource(
     collectionOperations:[
-        // "get"=>[
-        //     'method' => 'get',
+        "get"=>[
+            // 'method' => 'get',
         //     'status' => Response::HTTP_OK,
-        //     'normalization_context' => ['groups' => ['produit:read:simple']],
-        //     ],
+            'normalization_context' => ['groups' => ['produit:read:simple']],
+            ],
             // "post" => [
             //     'denormalization_context' => ['groups' => ['write']],
             //     'normalization_context' => ['groups' => ['produit:read:all']],
@@ -35,16 +35,16 @@ use Symfony\Component\Validator\Constraints as Assert;
                 "controller"=>ProduitController::class,
                 ]   
             ],
-    // itemOperations:[
+    itemOperations:[
     // //     "put"=>[
     // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
     // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
     // // ],
-    // "get"=>[
+    "get"=>[
     //     // 'method' => 'get',
     //     // 'status' => Response::HTTP_OK,
     //     'normalization_context' => ['groups' => ['produit:read:all']],
-    //     ]]
+        ]]
 )]
 class Produit
 {
@@ -67,7 +67,6 @@ class Produit
     // #[Groups(["produit:read:simple","produit:read:all","write"])]
     #[Groups(["produit:read:simple","write_boisson","write_fritte",
     "fritte:read:simple","menu:read:simple"])]
-    #[Assert\NotBlank(message:"Le prix est Obligatoire")]
     protected $prix;
 
     #[ORM\Column(type: 'boolean')]

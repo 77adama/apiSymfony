@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Zone;
 use App\Entity\Produit;
+use App\Entity\Commande;
 use App\Entity\Quartier;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -41,6 +42,9 @@ class UserSubscriber implements EventSubscriberInterface
         if ($args->getObject() instanceof Produit or $args->getObject() instanceof Zone
         or $args->getObject() instanceof Quartier) {
         $args->getObject()->setGestionnaire($this->getUser());
+        }
+        if($args->getObject() instanceof Commande) {
+            $args->getObject()->setClient($this->getUser());
         }
         }
 }

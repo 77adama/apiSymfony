@@ -22,9 +22,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
-            // "get" => [
+            "get" => [
             //     'normalization_context' => ['groups' => ['produit:read:all']],
-            //     ],
+                ],
             ],
             itemOperations:[
                 "put"=>[
@@ -48,13 +48,14 @@ class Menu extends Produit
 
     #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
    // #[Groups(["menu:read:simple","write_menu"])]
+   #[Assert\NotBlank(message:"Le burgers est Obligatoire")]
     private $burger;
 
     #[ORM\ManyToMany(targetEntity: FrittePortion::class, mappedBy: 'menu')]
    // #[Groups(["menu:read:simple","write_menu"])]
     private $frittePortions;
 
-    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'menus')]
+    #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'menus')]
     private $boisson;
 
     
@@ -71,6 +72,7 @@ class Menu extends Produit
         // $this->boissons = new ArrayCollection();
         $this->burger = new ArrayCollection();
         $this->frittePortions = new ArrayCollection();
+        $this->boisson = new ArrayCollection();
 
     }
 
@@ -152,17 +154,30 @@ class Menu extends Produit
 
     // }
 
-    public function getBoisson(): ?Boisson
+    /**
+     * @return Collection<int, Boisson>
+     */
+    public function getBoisson(): Collection
     {
         return $this->boisson;
     }
 
-    public function setBoisson(?Boisson $boisson): self
+    public function addBoisson(Boisson $boisson): self
     {
-        $this->boisson = $boisson;
+        if (!$this->boisson->contains($boisson)) {
+            $this->boisson[] = $boisson;
+        }
 
         return $this;
     }
+
+    public function removeBoisson(Boisson $boisson): self
+    {
+        $this->boisson->removeElement($boisson);
+
+        return $this;
+    }
+
 
    
 }

@@ -14,14 +14,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations:[
 
         "post" => [
-            'denormalization_context' => ['groups' => ['write_fritte']],
+            // 'denormalization_context' => ['groups' => ['write_fritte']],
             // 'normalization_context' => ['groups' => ['produit:read:all']],
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
-            // "get" => [
+            "get" => [
             //     'normalization_context' => ['groups' => ['produit:read:all']],
-            //     ],
+                ],
             ],
             itemOperations:[
                 "put"=>[
@@ -31,8 +31,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "get"=>[
                 // 'method' => 'get',
                 // 'status' => Response::HTTP_OK,
-                'normalization_context' => ['groups' => ['fritte:read:simple']],
-                ]]
+                // 'normalization_context' => ['groups' => ['fritte:read:simple']],
+                ]
+                ]
 )]
 class FrittePortion extends Produit
 {

@@ -19,9 +19,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
-            // "get" => [
+            "get" => [
             //     'normalization_context' => ['groups' => ['produit:read:all']],
-            //     ],
+                ],
             ],
             itemOperations:[
                 "put"=>[
@@ -38,15 +38,15 @@ class Boisson  extends Produit
 {
 
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write_boisson","boisson:read:simple","menu:read:simple"])]
-    private $taille;
+    // #[ORM\Column(type: 'string', length: 255)]
+    // #[Groups(["write_boisson","boisson:read:simple","menu:read:simple"])]
+    // private $taille;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'boisson')]
-    private $menu;
-
-    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: Menu::class)]
+    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'boisson')]
     private $menus;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $libelle;
 
 
     public function __construct()
@@ -55,33 +55,6 @@ class Boisson  extends Produit
     }
 
 
-
-
-
-
-    public function getTaille(): ?string
-    {
-        return $this->taille;
-    }
-
-    public function setTaille(string $taille): self
-    {
-        $this->taille = $taille;
-
-        return $this;
-    }
-
-    public function getMenu(): ?Menu
-    {
-        return $this->menu;
-    }
-
-    public function setMenu(?Menu $menu): self
-    {
-        $this->menu = $menu;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Menu>
@@ -95,7 +68,7 @@ class Boisson  extends Produit
     {
         if (!$this->menus->contains($menu)) {
             $this->menus[] = $menu;
-            $menu->setBoisson($this);
+            $menu->addBoisson($this);
         }
 
         return $this;
@@ -104,15 +77,22 @@ class Boisson  extends Produit
     public function removeMenu(Menu $menu): self
     {
         if ($this->menus->removeElement($menu)) {
-            // set the owning side to null (unless already changed)
-            if ($menu->getBoisson() === $this) {
-                $menu->setBoisson(null);
-            }
+            $menu->removeBoisson($this);
         }
 
         return $this;
     }
 
-   
+    public function getLibelle(): ?string
+    {
+        return $this->libelle;
+    }
+
+    public function setLibelle(string $libelle): self
+    {
+        $this->libelle = $libelle;
+
+        return $this;
+    }
 
 }

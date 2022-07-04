@@ -19,6 +19,9 @@ class Livreur extends User
     #[ORM\Column(type: 'string', length: 255)]
     private $matricule;
 
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'livreur')]
+    private $livraison;
+
 
     public function getId(): ?int
     {
@@ -33,6 +36,18 @@ class Livreur extends User
     public function setMatricule(string $matricule): self
     {
         $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getLivraison(): ?Livraison
+    {
+        return $this->livraison;
+    }
+
+    public function setLivraison(?Livraison $livraison): self
+    {
+        $this->livraison = $livraison;
 
         return $this;
     }

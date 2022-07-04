@@ -18,6 +18,7 @@ class PersisterProduit implements ContextAwareDataPersisterInterface
 {
     protected $entityManager;
     protected $encoder;
+    protected $prix=0;
     
 
     public function __construct(
@@ -43,8 +44,21 @@ class PersisterProduit implements ContextAwareDataPersisterInterface
         if ($data instanceof Boisson or $data instanceof FrittePortion) {
            $data->setPrix(0);
         }elseif ($data instanceof Menu ) {
-            # code...
+           foreach ($data->getBurger() as $burger) {
+            $this->prix+=$burger->getPrix();
+           }
+          
+
+           foreach ($data->getFrittePortions() as $frittePortions) {
+               $this->prix+=$frittePortions->getPrix();
+            }
+            foreach ($data->getBoisson() as $boisson) {
+                 $this->prix+=$boisson->getPrix();
+            }
+            $this->prix-=$this->prix*0.05;
+           $data->setPrix($this->prix);
         }
+       
            
             $this->entityManager->persist($data);
             $this->entityManager->flush();

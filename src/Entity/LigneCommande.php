@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LigneCommandeRepository::class)]
-#[ApiResource]
 class LigneCommande
 {
     #[ORM\Id]
@@ -17,17 +16,15 @@ class LigneCommande
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'float')]
-    private $prixTotal;
 
     #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)]
     private $produit;
 
-    #[ORM\Column(type: 'float')]
-    private $nbreProduit;
-
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ligneCommande')]
     private $commande;
+
+    #[ORM\Column(type: 'float')]
+    private $quantite;
 
 
 
@@ -42,17 +39,7 @@ class LigneCommande
         return $this->id;
     }
 
-    public function getPrixTotal(): ?float
-    {
-        return $this->prixTotal;
-    }
 
-    public function setPrixTotal(float $prixTotal): self
-    {
-        $this->prixTotal = $prixTotal;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Produit>
@@ -84,18 +71,6 @@ class LigneCommande
         return $this;
     }
 
-    public function getNbreProduit(): ?float
-    {
-        return $this->nbreProduit;
-    }
-
-    public function setNbreProduit(float $nbreProduit): self
-    {
-        $this->nbreProduit = $nbreProduit;
-
-        return $this;
-    }
-
     public function getCommande(): ?Commande
     {
         return $this->commande;
@@ -104,6 +79,18 @@ class LigneCommande
     public function setCommande(?Commande $commande): self
     {
         $this->commande = $commande;
+
+        return $this;
+    }
+
+    public function getQuantite(): ?float
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(float $quantite): self
+    {
+        $this->quantite = $quantite;
 
         return $this;
     }

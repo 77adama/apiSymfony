@@ -33,6 +33,7 @@ class Client extends User
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    #[ApiSubresource]
     private $commandes;
 
     public function __construct()

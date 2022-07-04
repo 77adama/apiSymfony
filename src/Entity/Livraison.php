@@ -18,10 +18,16 @@ class Livraison
     private $id;
 
     #[ORM\Column(type: 'boolean')]
-    private $etat_livraison;
+    private $etat_livraison=true;
 
     #[ORM\Column(type: 'datetime')]
     private $DateAt;
+
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'livraison')]
+    private $commande;
+
+    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Livreur::class)]
+    private $livreur;
 
 
     public function __construct()
@@ -54,6 +60,48 @@ class Livraison
     public function setDateAt(\DateTimeInterface $DateAt): self
     {
         $this->DateAt = $DateAt;
+
+        return $this;
+    }
+
+    public function getCommande(): ?Commande
+    {
+        return $this->commande;
+    }
+
+    public function setCommande(?Commande $commande): self
+    {
+        $this->commande = $commande;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Livreur>
+     */
+    public function getLivreur(): Collection
+    {
+        return $this->livreur;
+    }
+
+    public function addLivreur(Livreur $livreur): self
+    {
+        if (!$this->livreur->contains($livreur)) {
+            $this->livreur[] = $livreur;
+            $livreur->setLivraison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivreur(Livreur $livreur): self
+    {
+        if ($this->livreur->removeElement($livreur)) {
+            // set the owning side to null (unless already changed)
+            if ($livreur->getLivraison() === $this) {
+                $livreur->setLivraison(null);
+            }
+        }
 
         return $this;
     }
