@@ -29,10 +29,14 @@ class Livraison
     #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Livreur::class)]
     private $livreur;
 
+    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Zone::class)]
+    private $zones;
+
 
     public function __construct()
     {
         $this->livreur = new ArrayCollection();
+        $this->zones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,6 +104,36 @@ class Livraison
             // set the owning side to null (unless already changed)
             if ($livreur->getLivraison() === $this) {
                 $livreur->setLivraison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZones(): Collection
+    {
+        return $this->zones;
+    }
+
+    public function addZone(Zone $zone): self
+    {
+        if (!$this->zones->contains($zone)) {
+            $this->zones[] = $zone;
+            $zone->setLivraison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): self
+    {
+        if ($this->zones->removeElement($zone)) {
+            // set the owning side to null (unless already changed)
+            if ($zone->getLivraison() === $this) {
+                $zone->setLivraison(null);
             }
         }
 

@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 #[ApiResource(
@@ -47,7 +48,6 @@ class Menu extends Produit
 
 
     #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
-   // #[Groups(["menu:read:simple","write_menu"])]
    #[Assert\NotBlank(message:"Le burgers est Obligatoire")]
     private $burger;
 

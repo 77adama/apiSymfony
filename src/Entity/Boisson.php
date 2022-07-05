@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "get"=>[
                 // 'method' => 'get',
                 // 'status' => Response::HTTP_OK,
-                'normalization_context' => ['groups' => ['boisson:read:simple']],
+                // 'normalization_context' => ['groups' => ['boisson:read:simple']],
                 ]]
 )]
 class Boisson  extends Produit
@@ -46,12 +46,18 @@ class Boisson  extends Produit
     private $menus;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["write_boisson"])]
     private $libelle;
+
+    #[ORM\ManyToMany(targetEntity: Taille::class, mappedBy: 'boisson')]
+    #[Groups(["write_boisson"])]
+    private $tailles;
 
 
     public function __construct()
     {
         $this->menus = new ArrayCollection();
+        $this->tailles = new ArrayCollection();
     }
 
 
@@ -91,6 +97,33 @@ class Boisson  extends Produit
     public function setLibelle(string $libelle): self
     {
         $this->libelle = $libelle;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Taille>
+     */
+    public function getTailles(): Collection
+    {
+        return $this->tailles;
+    }
+
+    public function addTaille(Taille $taille): self
+    {
+        if (!$this->tailles->contains($taille)) {
+            $this->tailles[] = $taille;
+            $taille->addBoisson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTaille(Taille $taille): self
+    {
+        if ($this->tailles->removeElement($taille)) {
+            $taille->removeBoisson($this);
+        }
 
         return $this;
     }

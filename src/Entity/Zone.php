@@ -33,8 +33,8 @@ class Zone
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'zones')]
     private $gestionnaire;
 
-    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]
-    private $commandes;
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'zones')]
+    private $livraison;
 
     public function __construct()
     {
@@ -128,33 +128,16 @@ class Zone
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection
+    public function getLivraison(): ?Livraison
     {
-        return $this->commandes;
+        return $this->livraison;
     }
 
-    public function addCommande(Commande $commande): self
+    public function setLivraison(?Livraison $livraison): self
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
-            $commande->setZone($this);
-        }
+        $this->livraison = $livraison;
 
         return $this;
     }
 
-    public function removeCommande(Commande $commande): self
-    {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getZone() === $this) {
-                $commande->setZone(null);
-            }
-        }
-
-        return $this;
-    }
 }

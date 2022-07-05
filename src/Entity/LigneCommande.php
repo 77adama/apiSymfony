@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\LigneCommandeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\LigneCommandeRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LigneCommandeRepository::class)]
 class LigneCommande
@@ -17,14 +18,19 @@ class LigneCommande
     private $id;
 
 
-    #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)]
+    #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)] 
     private $produit;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ligneCommande')]
     private $commande;
 
     #[ORM\Column(type: 'float')]
+    #[Groups(["commande:write","commande:read:simple"])]
     private $quantite;
+
+    #[ORM\Column(type: 'float')]
+    #[Groups(["commande:write","commande:read:simple"])]
+    private $prix;
 
 
 
@@ -91,6 +97,18 @@ class LigneCommande
     public function setQuantite(float $quantite): self
     {
         $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(float $prix): self
+    {
+        $this->prix = $prix;
 
         return $this;
     }

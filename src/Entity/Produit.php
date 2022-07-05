@@ -23,12 +23,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         //     'status' => Response::HTTP_OK,
             'normalization_context' => ['groups' => ['produit:read:simple']],
             ],
-            // "post" => [
+            "post" => [
             //     'denormalization_context' => ['groups' => ['write']],
             //     'normalization_context' => ['groups' => ['produit:read:all']],
             //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             //     "security_message"=>"Vous n'avez pas access à cette Ressource",
-            //     ],
+                ],
           "add" => [
                 'method' => 'Post',
                 "path"=>"/add",
@@ -53,6 +53,7 @@ class Produit
     #[ORM\Column(type: 'integer')]
     //#[Groups(["write_menu"])]
     // #[Groups(["produit:read:simple","produit:read:all"])]
+    #[Groups(["commande:write"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 255)]

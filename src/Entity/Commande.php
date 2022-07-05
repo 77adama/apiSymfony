@@ -2,23 +2,27 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\CommandeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\ProduitController;
+use App\Repository\CommandeRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ApiResource(
     collectionOperations:[
-        // "get"=>[
-        //     'method' => 'get',
+        "get"=>[
+            // 'method' => 'get',
         //     'status' => Response::HTTP_OK,
-        //     'normalization_context' => ['groups' => ['produit:read:simple']],
-        //     ],
+            'normalization_context' => ['groups' => ['commande:read:simple']],
+            ],
             "post" => [
-                // 'denormalization_context' => ['groups' => ['write']],
-                // 'normalization_context' => ['groups' => ['produit:read:all']],
+                'denormalization_context' => ['groups' => ['commande:write']],
+                // 'serialization_context' => 
+                // 'normalization_context' => ['groups' => ['commande:read:all']],
                 "security"=>"is_granted('ROLE_CLIENT')",
                 "security_message"=>"Vous n'avez pas access à cette Ressource",
                 ],
@@ -28,49 +32,54 @@ use Doctrine\ORM\Mapping as ORM;
         //         "controller"=>ProduitController::class,
         //         ]   
             ],
-    // itemOperations:[
-    // //     "put"=>[
+    itemOperations:[
+        "put"=>[
     // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
     // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
-    // // ],
-    // "get"=>[
+    ],
+    "get"=>[
     //     // 'method' => 'get',
     //     // 'status' => Response::HTTP_OK,
-    //     'normalization_context' => ['groups' => ['produit:read:all']],
-    //     ]]
+        // 'normalization_context' => ['groups' => ['commande:read:simple']],
+        ],
+        // "post"=>[
+        //         // 'method' => 'post',
+        //     //     // 'status' => Response::HTTP_OK,
+        //         'normalization_context' => ['groups' => ['listeCommandeFull']],
+        //         ]
+        ]
 )]
 class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["commande:read:simple"])]
     private $id;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime',nullable:true)]
+    // #[Groups(["listeCommandeFull"])]
     private $timeAt;
 
-    #[ORM\Column(type: 'boolean')] 
+    #[ORM\Column(type: 'boolean')]
     private $isEtat=true;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: LigneCommande::class)]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: LigneCommande::class,cascade:["persist"])]
+    #[SerializedName("produits")]
+    #[Groups(["commande:write","commande:read:simple"])]
     private $ligneCommande;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
+    #[Groups(["commande:write","commande:read:simple"])]
     private $client;
 
-    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
-    private $zone;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: Livraison::class)]
-    private $livraison;
 
     public function __construct()
     {
         $this->ligneCommande = new ArrayCollection();
-        $this->livraison = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,48 +161,6 @@ class Commande
     public function setClient(?Client $client): self
     {
         $this->client = $client;
-
-        return $this;
-    }
-
-    public function getZone(): ?Zone
-    {
-        return $this->zone;
-    }
-
-    public function setZone(?Zone $zone): self
-    {
-        $this->zone = $zone;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Livraison>
-     */
-    public function getLivraison(): Collection
-    {
-        return $this->livraison;
-    }
-
-    public function addLivraison(Livraison $livraison): self
-    {
-        if (!$this->livraison->contains($livraison)) {
-            $this->livraison[] = $livraison;
-            $livraison->setCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLivraison(Livraison $livraison): self
-    {
-        if ($this->livraison->removeElement($livraison)) {
-            // set the owning side to null (unless already changed)
-            if ($livraison->getCommande() === $this) {
-                $livraison->setCommande(null);
-            }
-        }
 
         return $this;
     }
