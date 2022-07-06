@@ -17,12 +17,12 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         "get"=>[
             // 'method' => 'get',
         //     'status' => Response::HTTP_OK,
-            'normalization_context' => ['groups' => ['commande:read:simple']],
+         //   'normalization_context' => ['groups' => ['commande:read:simple']],
             ],
             "post" => [
                 'denormalization_context' => ['groups' => ['commande:write']],
                 // 'serialization_context' => 
-                // 'normalization_context' => ['groups' => ['commande:read:all']],
+                'normalization_context' => ['groups' => ['commande:read:simple']],
                 "security"=>"is_granted('ROLE_CLIENT')",
                 "security_message"=>"Vous n'avez pas access à cette Ressource",
                 ],
@@ -38,15 +38,10 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
     ],
     "get"=>[
-    //     // 'method' => 'get',
+         'method' => 'get',
     //     // 'status' => Response::HTTP_OK,
-        // 'normalization_context' => ['groups' => ['commande:read:simple']],
+     //   'normalization_context' => ['groups' => ['commande:read:simple']],
         ],
-        // "post"=>[
-        //         // 'method' => 'post',
-        //     //     // 'status' => Response::HTTP_OK,
-        //         'normalization_context' => ['groups' => ['listeCommandeFull']],
-        //         ]
         ]
 )]
 class Commande
@@ -65,15 +60,15 @@ class Commande
     private $isEtat=true;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: LigneCommande::class,cascade:["persist"])]
+    #[Groups(["commande:write","commande:read:simple","commande:write:simple"])]
     #[SerializedName("produits")]
-    #[Groups(["commande:write","commande:read:simple"])]
     private $ligneCommande;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
-    #[Groups(["commande:write","commande:read:simple"])]
+    #[Groups(["commande:read:simple"])]
     private $client;
 
 

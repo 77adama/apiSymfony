@@ -17,14 +17,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"role", type:"string")]
 #[ORM\DiscriminatorMap(["gestionnaaire"=>"Gestionnaire","client" => "Client","livreur"=>"Livreur" ])]
-// /**
-//  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
-//  *
-//  * @ApiResource(
-//  * normalizationContext={"groups"={"user:read"}},
-//  * denormalizationContext={"groups"={"user:write"}}
-//  * )
-//  */
 #[ApiResource(
     collectionOperations:[
         // "get",

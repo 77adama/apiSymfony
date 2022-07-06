@@ -15,29 +15,31 @@ class LigneCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["commande:write","commande:write:simple"])]
     private $id;
 
 
-    #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)] 
-    private $produit;
+
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ligneCommande')]
     private $commande;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:write","commande:read:simple"])]
+    #[Groups(["commande:write","commande:read:simple","commande:write:simple"])]
     private $quantite;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:write","commande:read:simple"])]
+    #[Groups(["commande:read:simple"])]
     private $prix;
 
+    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'ligneCommandes')]
+    #[Groups(["commande:write","commande:read:simple"])]
+    private $produit;
 
 
     public function __construct()
     {
-
-        $this->produit = new ArrayCollection();
+       
     }
 
     public function getId(): ?int
@@ -47,36 +49,7 @@ class LigneCommande
 
 
 
-    /**
-     * @return Collection<int, Produit>
-     */
-    public function getProduit(): Collection
-    {
-        return $this->produit;
-    }
-
-    public function addProduit(Produit $produit): self
-    {
-        if (!$this->produit->contains($produit)) {
-            $this->produit[] = $produit;
-            $produit->setLigneCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProduit(Produit $produit): self
-    {
-        if ($this->produit->removeElement($produit)) {
-            // set the owning side to null (unless already changed)
-            if ($produit->getLigneCommande() === $this) {
-                $produit->setLigneCommande(null);
-            }
-        }
-
-        return $this;
-    }
-
+   
     public function getCommande(): ?Commande
     {
         return $this->commande;
@@ -112,5 +85,18 @@ class LigneCommande
 
         return $this;
     }
+
+    public function getProduit(): ?Produit
+    {
+        return $this->produit;
+    }
+
+    public function setProduit(?Produit $produit): self
+    {
+        $this->produit = $produit;
+
+        return $this;
+    }
+
 
 }

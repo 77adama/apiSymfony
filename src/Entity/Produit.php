@@ -78,9 +78,16 @@ class Produit
     #[Groups(["write","produit:read:simple","boisson:read:simple","fritte:read:simple"])]
     protected $gestionnaire;
 
+    #[ORM\ManyToMany(targetEntity: LigneCommande::class, inversedBy: 'produits')]
+    private $ligneCommande;
+
+    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: LigneCommande::class)]
+    private $ligneCommandes;
+
+
  
-    #[ORM\ManyToOne(targetEntity: LigneCommande::class, inversedBy: 'produit')]
-    protected $ligneCommande;
+
+ 
 
     public function __construct()
     {
@@ -146,15 +153,32 @@ class Produit
         return $this;
     }
 
-
-    public function getLigneCommande(): ?LigneCommande
+    /**
+     * @return Collection<int, LigneCommande>
+     */
+    public function getLigneCommandes(): Collection
     {
-        return $this->ligneCommande;
+        return $this->ligneCommandes;
     }
 
-    public function setLigneCommande(?LigneCommande $ligneCommande): self
+    public function addLigneCommande(LigneCommande $ligneCommande): self
     {
-        $this->ligneCommande = $ligneCommande;
+        if (!$this->ligneCommandes->contains($ligneCommande)) {
+            $this->ligneCommandes[] = $ligneCommande;
+            $ligneCommande->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigneCommande(LigneCommande $ligneCommande): self
+    {
+        if ($this->ligneCommandes->removeElement($ligneCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($ligneCommande->getProduit() === $this) {
+                $ligneCommande->setProduit(null);
+            }
+        }
 
         return $this;
     }
