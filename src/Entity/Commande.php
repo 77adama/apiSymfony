@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ApiResource(
@@ -17,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         "get"=>[
             // 'method' => 'get',
         //     'status' => Response::HTTP_OK,
-         //   'normalization_context' => ['groups' => ['commande:read:simple']],
+           'normalization_context' => ['groups' => ['commande:read:simple']],
             ],
             "post" => [
                 'denormalization_context' => ['groups' => ['commande:write']],
@@ -40,7 +41,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
     "get"=>[
          'method' => 'get',
     //     // 'status' => Response::HTTP_OK,
-     //   'normalization_context' => ['groups' => ['commande:read:simple']],
+        'normalization_context' => ['groups' => ['commande:read:one']],
         ],
         ]
 )]
@@ -49,7 +50,7 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["commande:read:simple"])]
+    #[Groups(["commande:read:simple","commande:read:one"])]
     private $id;
 
     #[ORM\Column(type: 'datetime',nullable:true)]
@@ -60,7 +61,8 @@ class Commande
     private $isEtat=true;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: LigneCommande::class,cascade:["persist"])]
-    #[Groups(["commande:write","commande:read:simple","commande:write:simple"])]
+    #[Groups(["commande:write","commande:read:simple","commande:write:simple","commande:read:one"])]
+    #[Assert\NotBlank(message:"Le nom est Obligatoire")]
     #[SerializedName("produits")]
     private $ligneCommande;
 
@@ -68,8 +70,11 @@ class Commande
     private $gestionnaire;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
-    #[Groups(["commande:read:simple"])]
+    #[Groups(["commande:read:simple","commande:read:one"])]
     private $client;
+
+    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
+    private $livraison;
 
 
     public function __construct()
@@ -156,6 +161,18 @@ class Commande
     public function setClient(?Client $client): self
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getLivraison(): ?Livraison
+    {
+        return $this->livraison;
+    }
+
+    public function setLivraison(?Livraison $livraison): self
+    {
+        $this->livraison = $livraison;
 
         return $this;
     }

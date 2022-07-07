@@ -33,13 +33,16 @@ class Zone
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'zones')]
     private $gestionnaire;
 
-    #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'zones')]
-    private $livraison;
+
+
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Livraison::class)]
+    private $livraisons;
 
     public function __construct()
     {
         $this->quartier = new ArrayCollection();
         $this->commandes = new ArrayCollection();
+        $this->livraisons = new ArrayCollection();
     }
 
     // #[ORM\Column(type: 'string', length: 255)]
@@ -128,14 +131,33 @@ class Zone
         return $this;
     }
 
-    public function getLivraison(): ?Livraison
+
+    /**
+     * @return Collection<int, Livraison>
+     */
+    public function getLivraisons(): Collection
     {
-        return $this->livraison;
+        return $this->livraisons;
     }
 
-    public function setLivraison(?Livraison $livraison): self
+    public function addLivraison(Livraison $livraison): self
     {
-        $this->livraison = $livraison;
+        if (!$this->livraisons->contains($livraison)) {
+            $this->livraisons[] = $livraison;
+            $livraison->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivraison(Livraison $livraison): self
+    {
+        if ($this->livraisons->removeElement($livraison)) {
+            // set the owning side to null (unless already changed)
+            if ($livraison->getZone() === $this) {
+                $livraison->setZone(null);
+            }
+        }
 
         return $this;
     }

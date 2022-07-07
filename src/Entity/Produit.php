@@ -53,21 +53,20 @@ class Produit
     #[ORM\Column(type: 'integer')]
     //#[Groups(["write_menu"])]
     // #[Groups(["produit:read:simple","produit:read:all"])]
-    #[Groups(["commande:write"])]
+    #[Groups(["commande:write","write_menu"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    // #[Groups(["produit:read:simple","produit:read:all","write"])]
     #[Groups(["write","produit:read:simple","write_boisson",
     "boisson:read:simple","write_fritte","fritte:read:simple",
-    "menu:read:simple","menu:read:simple"])]
+    "menu:read:simple","menu:read:simple","write_burger","write_menu"])]
     #[Assert\NotBlank(message:"Le nom est Obligatoire")]
     protected $nom;
 
     #[ORM\Column(type: 'float')]
     // #[Groups(["produit:read:simple","produit:read:all","write"])]
     #[Groups(["produit:read:simple","write_boisson","write_fritte",
-    "fritte:read:simple","menu:read:simple"])]
+    "fritte:read:simple","menu:read:simple","write_menu"])]
     protected $prix;
 
     #[ORM\Column(type: 'boolean')]
@@ -78,8 +77,7 @@ class Produit
     #[Groups(["write","produit:read:simple","boisson:read:simple","fritte:read:simple"])]
     protected $gestionnaire;
 
-    #[ORM\ManyToMany(targetEntity: LigneCommande::class, inversedBy: 'produits')]
-    private $ligneCommande;
+
 
     #[ORM\OneToMany(mappedBy: 'produit', targetEntity: LigneCommande::class)]
     private $ligneCommandes;

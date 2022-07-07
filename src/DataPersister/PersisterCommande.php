@@ -39,7 +39,7 @@ class PersisterCommande implements ContextAwareDataPersisterInterface
     {
             foreach ($data->getLigneCommande() as $ligneCommande) {
 
-            $this->prix=$ligneCommande->getProduit()->getPrix();
+            $this->prix=$ligneCommande->getProduit()->getPrix()*$ligneCommande->getQuantite();
             $ligneCommande->setPrix($this->prix);
             
             }   

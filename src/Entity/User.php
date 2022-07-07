@@ -29,12 +29,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         // "post" => [
         //     'normalization_context' => ['groups' => ['produit:read:all']],
         //     ],
-        // "token" => [
-        //     'method' => 'patch',
-        //     "path"=>"user/validate/{token}",
-        //     "controller"=>ValideEmail::class,
-        //     "deserialize"=>false
-        //     ]   
+        "token" => [
+            'method' => 'patch',
+            "path"=>"user/validate/{token}",
+            "controller"=>ValideEmail::class,
+            "deserialize"=>false
+            ]   
         ],
         
 )]
@@ -43,13 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    // #[Groups(["produit:read:all",'write',"user:read:simple","produit:read:simple"])]
-    #[Groups(["produit:read:simple","boisson:read:simple","fritte:read:simple"])]
+    #[Groups(["boisson:read:simple","fritte:read:simple"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     // #[Groups(["produit:read:all","user:read:simple","produit:read:simple","write_"])]
-    #[Groups(["produit:read:simple","boisson:read:simple","fritte:read:simple"])]
+    #[Groups(["livraison:read:all","boisson:read:simple","fritte:read:simple"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
@@ -62,7 +61,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255)]
-    // #[Groups(["produit:read:simple","write_"])]
+    #[Groups(["livraison:read:all","write_"])]
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -86,11 +85,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255)]
     private $token;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Menu::class)]
+    private $menus;
+
     public function __construct()
     {
         $this->produits = new ArrayCollection();
         $this->expireAt= new \DateTime("+1 day");
         $this->token=str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(random_bytes(128)));
+        $this->menus = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -261,6 +264,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(string $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Menu>
+     */
+    public function getMenus(): Collection
+    {
+        return $this->menus;
+    }
+
+    public function addMenu(Menu $menu): self
+    {
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+            $menu->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenu(Menu $menu): self
+    {
+        if ($this->menus->removeElement($menu)) {
+            // set the owning side to null (unless already changed)
+            if ($menu->getUser() === $this) {
+                $menu->setUser(null);
+            }
+        }
 
         return $this;
     }

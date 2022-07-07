@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LigneCommandeRepository::class)]
 class LigneCommande
@@ -15,7 +16,7 @@ class LigneCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["commande:write","commande:write:simple"])]
+    #[Groups(["commande:write","commande:write:simple","commande:read:one"])]
     private $id;
 
 
@@ -25,15 +26,16 @@ class LigneCommande
     private $commande;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:write","commande:read:simple","commande:write:simple"])]
+    #[Groups(["commande:write","commande:read:simple","commande:write:simple","commande:read:one"])]
+    #[Assert\NotBlank(message:"La quantite est Obligatoire")]
     private $quantite;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:read:simple"])]
+    #[Groups(["commande:read:simple","commande:read:one"])]
     private $prix;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'ligneCommandes')]
-    #[Groups(["commande:write","commande:read:simple"])]
+    #[Groups(["commande:write","commande:read:simple","commande:read:one"])]
     private $produit;
 
 

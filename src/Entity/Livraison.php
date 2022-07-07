@@ -2,14 +2,39 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\LivraisonRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\LivraisonRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get"=>[
+            // 'method' => 'get',
+        //     'status' => Response::HTTP_OK,
+            'normalization_context' => ['groups' => ['livraison:read:all']],
+            ],
+            "post" => [
+                 'denormalization_context' => ['groups' => ['write_livraison']],
+                // 'normalization_context' => ['groups' => ['produit:read:all']],
+                "security"=>"is_granted('ROLE_LIVREUR')",
+                "security_message"=>"Vous n'avez pas access à cette Ressource",
+                ]  
+            ],
+    itemOperations:[
+    // //     "put"=>[
+    // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+    // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
+    // // ],
+    "get"=>[
+    //     // 'method' => 'get',
+    //     // 'status' => Response::HTTP_OK,
+    //     'normalization_context' => ['groups' => ['produit:read:all']],
+        ]]
+)]
 class Livraison
 {
     #[ORM\Id]
@@ -20,24 +45,24 @@ class Livraison
     #[ORM\Column(type: 'boolean')]
     private $etat_livraison=true;
 
-    #[ORM\Column(type: 'datetime')]
-    private $DateAt;
+    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
+    #[Groups(["write_livraison","livraison:read:all"])]
+    private $commandes;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'livraison')]
-    private $commande;
+    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'livraisons')]
+    #[Groups(["write_livraison","livraison:read:all"])]
+    private $zone;
 
-    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Livreur::class)]
+    #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'livraisons')]
+    #[Groups(["livraison:read:all"])]
     private $livreur;
-
-    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Zone::class)]
-    private $zones;
-
 
     public function __construct()
     {
-        $this->livreur = new ArrayCollection();
-        $this->zones = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
     }
+
+ 
 
     public function getId(): ?int
     {
@@ -56,89 +81,58 @@ class Livraison
         return $this;
     }
 
-    public function getDateAt(): ?\DateTimeInterface
-    {
-        return $this->DateAt;
-    }
-
-    public function setDateAt(\DateTimeInterface $DateAt): self
-    {
-        $this->DateAt = $DateAt;
-
-        return $this;
-    }
-
-    public function getCommande(): ?Commande
-    {
-        return $this->commande;
-    }
-
-    public function setCommande(?Commande $commande): self
-    {
-        $this->commande = $commande;
-
-        return $this;
-    }
-
     /**
-     * @return Collection<int, Livreur>
+     * @return Collection<int, Commande>
      */
-    public function getLivreur(): Collection
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes[] = $commande;
+            $commande->setLivraison($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getLivraison() === $this) {
+                $commande->setLivraison(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getZone(): ?Zone
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?Zone $zone): self
+    {
+        $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getLivreur(): ?Livreur
     {
         return $this->livreur;
     }
 
-    public function addLivreur(Livreur $livreur): self
+    public function setLivreur(?Livreur $livreur): self
     {
-        if (!$this->livreur->contains($livreur)) {
-            $this->livreur[] = $livreur;
-            $livreur->setLivraison($this);
-        }
+        $this->livreur = $livreur;
 
         return $this;
     }
 
-    public function removeLivreur(Livreur $livreur): self
-    {
-        if ($this->livreur->removeElement($livreur)) {
-            // set the owning side to null (unless already changed)
-            if ($livreur->getLivraison() === $this) {
-                $livreur->setLivraison(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Zone>
-     */
-    public function getZones(): Collection
-    {
-        return $this->zones;
-    }
-
-    public function addZone(Zone $zone): self
-    {
-        if (!$this->zones->contains($zone)) {
-            $this->zones[] = $zone;
-            $zone->setLivraison($this);
-        }
-
-        return $this;
-    }
-
-    public function removeZone(Zone $zone): self
-    {
-        if ($this->zones->removeElement($zone)) {
-            // set the owning side to null (unless already changed)
-            if ($zone->getLivraison() === $this) {
-                $zone->setLivraison(null);
-            }
-        }
-
-        return $this;
-    }
-
-   
 }

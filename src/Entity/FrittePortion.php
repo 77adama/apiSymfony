@@ -43,17 +43,13 @@ class FrittePortion extends Produit
     #[Groups(["write_fritte","fritte:read:simple"])]
     private $portionnss;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, inversedBy: 'frittePortions')]
-    private $menu;
-
-    
-
-
+    #[ORM\OneToMany(mappedBy: 'fritte', targetEntity: MenuFritte::class)]
+    private $menuFrittes;
 
     public function __construct()
     {
         parent::__construct();
-        $this->menu = new ArrayCollection();
+        $this->menuFrittes = new ArrayCollection();
     }
 
 
@@ -70,27 +66,34 @@ class FrittePortion extends Produit
     }
 
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, MenuFritte>
      */
-    public function getMenu(): Collection
+    public function getMenuFrittes(): Collection
     {
-        return $this->menu;
+        return $this->menuFrittes;
     }
 
-    public function addMenu(Menu $menu): self
+    public function addMenuFritte(MenuFritte $menuFritte): self
     {
-        if (!$this->menu->contains($menu)) {
-            $this->menu[] = $menu;
+        if (!$this->menuFrittes->contains($menuFritte)) {
+            $this->menuFrittes[] = $menuFritte;
+            $menuFritte->setFritte($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self
+    public function removeMenuFritte(MenuFritte $menuFritte): self
     {
-        $this->menu->removeElement($menu);
+        if ($this->menuFrittes->removeElement($menuFritte)) {
+            // set the owning side to null (unless already changed)
+            if ($menuFritte->getFritte() === $this) {
+                $menuFritte->setFritte(null);
+            }
+        }
 
         return $this;
     }
+
     
 }

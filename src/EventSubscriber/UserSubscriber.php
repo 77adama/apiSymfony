@@ -7,6 +7,7 @@ use App\Entity\Produit;
 use App\Entity\Commande;
 use App\Entity\Quartier;
 use Doctrine\ORM\Events;
+use App\Entity\Livraison;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -45,6 +46,9 @@ class UserSubscriber implements EventSubscriberInterface
         }
         if($args->getObject() instanceof Commande) {
             $args->getObject()->setClient($this->getUser());
+        }
+        if($args->getObject() instanceof Livraison) {
+            $args->getObject()->setLivreur($this->getUser());
         }
         }
 }
