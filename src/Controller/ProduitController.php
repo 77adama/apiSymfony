@@ -16,12 +16,15 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 class ProduitController extends AbstractController
 {
+    
     public function __invoke(Request $request,
     ValidatorInterface $validator,
     TokenStorageInterface $tokenStorage,
     SerializerInterface $serializer,
     EntityManagerInterface $entityManager): JsonResponse
-    {$produit = $serializer->deserialize($request->getContent(),
+    {
+        
+        $produit = $serializer->deserialize($request->getContent(),
     Produit::class,'json');
     $errors = $validator->validate($produit);
     if (count($errors) > 0) {
@@ -29,6 +32,7 @@ class ProduitController extends AbstractController
     return new JsonResponse( $errorsString
     ,Response::HTTP_BAD_REQUEST,[],true);
     }
+    dd($tokenStorage->getToken());
     $produit->setUser($tokenStorage->getToken()->getUser());
     $entityManager->persist($produit);
     $entityManager->flush();

@@ -2,29 +2,53 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\ZoneRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ZoneRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
-/**
- * @ORM\Entity(repositoryClass="App\Repository\ZoneRepository")
- *
- * @ApiResource
- */
+#[ApiResource(
+    collectionOperations:[
+          "get"=>[
+            'normalization_context' => ['groups' => ['zone:read:all']],
+          ]
+           //   "post" => [
+
+            //      ]
+            ],
+    itemOperations:[
+        // "get"
+    // //     "put"=>[
+    // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+    // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
+    // // ],
+     "get"=>[
+    //     // 'method' => 'get',
+    //     // 'status' => Response::HTTP_OK,
+        'normalization_context' => ['groups' => ['zone:read:one']],
+         ]
+        ]
+)]
 class Zone
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["zone:read:all","zone:read:one","commande:read:all","livraison:read:all"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["zone:read:all","zone:read:one","commande:read:all","livraison:read:all",
+    "livraison:read:one"])]
     private $nom_zone;
 
     #[ORM\Column(type: 'float')]
+    #[Groups(["zone:read:all","zone:read:one","commande:read:all","livraison:read:all",
+    "livraison:read:one"])]
     private $prix_livr;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]
@@ -37,6 +61,11 @@ class Zone
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Livraison::class)]
     private $livraisons;
+
+    #[ORM\ManyToMany(targetEntity: Commande::class, mappedBy: 'zones')]
+    #[Groups(["zone:read:all","zone:read:one"])]
+    #[ApiSubresource]
+    private $commandes;
 
     public function __construct()
     {
@@ -157,6 +186,33 @@ class Zone
             if ($livraison->getZone() === $this) {
                 $livraison->setZone(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes[] = $commande;
+            $commande->addZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            $commande->removeZone($this);
         }
 
         return $this;

@@ -17,6 +17,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 //  */
 #[ApiResource(
     collectionOperations:[
+        "post" => [
+       
+         //   'denormalization_context' => ['groups' => ['write_g']],
+        ],
+        "get"=>[
+         
+        ]
     ],
 )]
 

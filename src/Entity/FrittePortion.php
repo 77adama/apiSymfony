@@ -14,13 +14,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations:[
 
         "post" => [
-            // 'denormalization_context' => ['groups' => ['write_fritte']],
+            'denormalization_context' => ['groups' => ['write_fritte']],
             // 'normalization_context' => ['groups' => ['produit:read:all']],
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
             "get" => [
-            //     'normalization_context' => ['groups' => ['produit:read:all']],
+               'normalization_context' => ['groups' => ['fritte:read:all']],
                 ],
             ],
             itemOperations:[
@@ -40,7 +40,8 @@ class FrittePortion extends Produit
 
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write_fritte","fritte:read:simple"])]
+    #[Groups(["write_fritte","fritte:read:simple","catalogue:read:all",
+    "menu:read:one","fritte:read:all"])]
     private $portionnss;
 
     #[ORM\OneToMany(mappedBy: 'fritte', targetEntity: MenuFritte::class)]

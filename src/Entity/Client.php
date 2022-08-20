@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Entity\User;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 /**
@@ -22,6 +24,17 @@ use ApiPlatform\Core\Annotation\ApiResource;
         'denormalization_context' => ['groups' => ['write_']],
         ]
         ],
+        itemOperations:[
+            
+            // //     "put"=>[
+            // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+            // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
+            // // ],
+            "get"=>[
+                'normalization_context' => ['groups' => ['client-reed-one']],
+            ]
+            
+                ]
         
 )]
 class Client extends User
@@ -29,10 +42,11 @@ class Client extends User
 
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write_"])]
+    #[Groups(["write_","client-reed-one"],"commande:read:all")]
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    #[Groups(["write_","client-reed-one"])]
     #[ApiSubresource]
     private $commandes;
 

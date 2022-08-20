@@ -44,9 +44,7 @@ class UserSubscriber implements EventSubscriberInterface
         or $args->getObject() instanceof Quartier) {
         $args->getObject()->setGestionnaire($this->getUser());
         }
-        if($args->getObject() instanceof Commande) {
-            $args->getObject()->setClient($this->getUser());
-        }
+        
         if($args->getObject() instanceof Livraison) {
             $args->getObject()->setLivreur($this->getUser());
         }

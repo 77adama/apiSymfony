@@ -4,12 +4,13 @@
 namespace App\DataPersister;
 
 use App\Entity\Menu;
+use App\Entity\Burger;
 use App\Entity\Boisson;
-use App\Entity\LigneCommande;
 use App\Entity\Produit;
 use App\Entity\Commande;
-use App\Entity\Burger;
+use App\Entity\Livraison;
 use App\Entity\FrittePortion;
+use App\Entity\LigneCommande;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 
@@ -28,7 +29,7 @@ class PersisterCommande implements ContextAwareDataPersisterInterface
      */
     public function supports($data, array $context = []): bool
     {
-        return $data instanceof Commande;
+        return $data instanceof Commande or $data instanceof Livraison;
     }
 
 
@@ -37,13 +38,19 @@ class PersisterCommande implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
-            foreach ($data->getLigneCommande() as $ligneCommande) {
 
-            $this->prix=$ligneCommande->getProduit()->getPrix()*$ligneCommande->getQuantite();
-            $ligneCommande->setPrix($this->prix);
+        // if ($data instanceof Livraison) {
+        //     $tr=$data->getLivreur();
+        // }
+
+            foreach ($data->getLigneCommande() as $ligneCommande) {
+           
+          
             
             }   
         $this->entityManager->persist($data);
+        // $tr->setEtatLiv('occupé');
+        // $this->entityManager->persist($tr);
             $this->entityManager->flush();
            
     }

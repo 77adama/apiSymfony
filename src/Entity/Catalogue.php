@@ -17,15 +17,21 @@ use ApiPlatform\Core\Annotation\ApiResource;
     collectionOperations:[
         'GET' => [
             'path' => '/catalogues',
+            'normalization_context' => ['groups' => ['catalogue:read:all']],
         ]
         ],
-    itemOperations:[]
+    itemOperations:[
+        'get' => [
+            
+            'normalization_context' => ['groups' => ['catalogue:read:one']],
+        ]
+    ]
 )]
 class Catalogue 
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    // #[Groups(["produit:read:simple","produit:read:all"])]
+    #[Groups(["menu:read:all","produit:read:all"])]
     private $id;
 }

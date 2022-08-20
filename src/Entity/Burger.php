@@ -15,8 +15,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         "post" => [
              'denormalization_context' => ['groups' => ['write_burger']],
             // 'normalization_context' => ['groups' => ['produit:read:all']],
-            "security"=>"is_granted('ROLE_GESTIONNAIRE')",
-            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            // "security"=>"is_granted('ROLE_GESTIONNAIRE')",
+            // "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
             "get" => [
                  'normalization_context' => ['groups' => ['produit:read:all']],
@@ -30,12 +30,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     "get"=>[
         // 'method' => 'get',
         // 'status' => Response::HTTP_OK,
-        // 'normalization_context' => ['groups' => ['produit:read:simple']],
+         'normalization_context' => ['groups' => ['produit:read:simple']],
         ]]
         ,)]
 class Burger extends Produit
 {
     #[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
+    #[Groups(["menu:read:al"])]
     private $menuBurgers;
 
     public function __construct()

@@ -18,14 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         "get"=>[
             // 'method' => 'get',
         //     'status' => Response::HTTP_OK,
-           'normalization_context' => ['groups' => ['commande:read:simple']],
+           'normalization_context' => ['groups' => ['commande:read:all']],
             ],
             "post" => [
                 'denormalization_context' => ['groups' => ['commande:write']],
                 // 'serialization_context' => 
-                'normalization_context' => ['groups' => ['commande:read:simple']],
-                "security"=>"is_granted('ROLE_CLIENT')",
-                "security_message"=>"Vous n'avez pas access à cette Ressource",
+                
+               // "security"=>"is_granted('ROLE_CLIENT')",
+              //  "security_message"=>"Vous n'avez pas access à cette Ressource",
                 ],
         //   "add" => [
         //         'method' => 'Post',
@@ -34,14 +34,26 @@ use Symfony\Component\Validator\Constraints as Assert;
         //         ]   
             ],
     itemOperations:[
-        "put"=>[
+        // "put"=>[
+            
+            // 'status' => Response::HTTP_OK,
+        // 'normalization_context' => ['groups' => ['commande:read:put']],
+
     // //     "security"=>"is_granted('ROLE_GESTIONNAIRE')",
     // //     "security_message"=>"Vous n'avez pas access à cette Ressource",
+    // ],
+    "put"=>[
+        'method' => 'put',
+        'denormalization_context' => ['groups' => ['commande:read:put']],
+
+        // "security" => "is_granted('ROLE_GESTIONNAIRE')",
+        // "security_message"=>"Vous n'avez pas access à cette Ressource",
+        // 'status' => Response::HTTP_OK,
     ],
     "get"=>[
-         'method' => 'get',
+      //   'method' => 'get',
     //     // 'status' => Response::HTTP_OK,
-        'normalization_context' => ['groups' => ['commande:read:one']],
+         'normalization_context' => ['groups' => ['commande:read:un']],
         ],
         ]
 )]
@@ -50,18 +62,23 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["commande:read:simple","commande:read:one"])]
+    #[Groups(["commande:read:all","commande:read:un","client-reed-one",
+    "zone:read:all","zone:read:one","livraison:read:put","livraison:read:one"])]
     private $id;
 
-    #[ORM\Column(type: 'datetime',nullable:true)]
-    // #[Groups(["listeCommandeFull"])]
-    private $timeAt;
+    // #[ORM\Column(type: 'datetime')]
+    // // #[Groups(["listeCommandeFull"])]
+    // private $timeAt;
 
-    #[ORM\Column(type: 'boolean')]
-    private $isEtat=true;
+    // #[ORM\Column(type: 'string', length: 255)]
+    // #[Groups(["client-reed-one","commande:read:un","commande:read:all",
+    // "commande:write"])]
+    // private $isEtat=encours;
 
+    
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: LigneCommande::class,cascade:["persist"])]
-    #[Groups(["commande:write","commande:read:simple","commande:write:simple","commande:read:one"])]
+    #[Groups(["commande:write","commande:write:simple","commande:read:un","commande:read:all","client-reed-one",
+    "zone:read:all","zone:read:one","livraison:read:all"])]
     #[Assert\NotBlank(message:"Le nom est Obligatoire")]
     #[SerializedName("produits")]
     private $ligneCommande;
@@ -70,16 +87,34 @@ class Commande
     private $gestionnaire;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
-    #[Groups(["commande:read:simple","commande:read:one"])]
+    #[Groups(["commande:read:simple","commande:read:one","commande:write","commande:read:all",
+    "commande:read:un","zone:read:all"])]
     private $client;
+
+    #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'commandes')]
+    #[Groups(["commande:read:simple","commande:read:one","commande:write","commande:read:all"])]
+    private $zones;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(["commande:read:simple","commande:read:one","commande:write","commande:read:all",
+    "zone:read:all","zone:read:one","client-reed-one"])]
+    private $timeAt;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["livraison:read:all","commande:read:simple","commande:read:one","commande:write","commande:read:all","commande:read:put",
+    "client-reed-one","zone:read:all","zone:read:one","livraison:read:one","livraison:read:put"])]
+    private $etat;
 
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
     private $livraison;
+
+   
 
 
     public function __construct()
     {
         $this->ligneCommande = new ArrayCollection();
+        $this->zones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -87,29 +122,29 @@ class Commande
         return $this->id;
     }
 
-    public function getTimeAt(): ?\DateTimeInterface
-    {
-        return $this->timeAt;
-    }
+    // public function getTimeAt(): ?\DateTimeInterface
+    // {
+    //     return $this->timeAt;
+    // }
 
-    public function setTimeAt(\DateTimeInterface $timeAt): self
-    {
-        $this->timeAt = $timeAt;
+    // public function setTimeAt(\DateTimeInterface $timeAt): self
+    // {
+    //     $this->timeAt = $timeAt;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function isIsEtat(): ?bool
-    {
-        return $this->isEtat;
-    }
+    // public function isIsEtat(): ?bool
+    // {
+    //     return $this->isEtat;
+    // }
 
-    public function setIsEtat(bool $isEtat): self
-    {
-        $this->isEtat = $isEtat;
+    // public function setIsEtat(bool $isEtat): self
+    // {
+    //     $this->isEtat = $isEtat;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, LigneCommande>
@@ -165,6 +200,54 @@ class Commande
         return $this;
     }
 
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZones(): Collection
+    {
+        return $this->zones;
+    }
+
+    public function addZone(Zone $zone): self
+    {
+        if (!$this->zones->contains($zone)) {
+            $this->zones[] = $zone;
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): self
+    {
+        $this->zones->removeElement($zone);
+
+        return $this;
+    }
+
+    public function getTimeAt(): ?\DateTimeImmutable
+    {
+        return $this->timeAt;
+    }
+
+    public function setTimeAt(\DateTimeImmutable $timeAt): self
+    {
+        $this->timeAt = $timeAt;
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(string $etat): self
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
     public function getLivraison(): ?Livraison
     {
         return $this->livraison;
@@ -176,5 +259,7 @@ class Commande
 
         return $this;
     }
+
+    
 
 }

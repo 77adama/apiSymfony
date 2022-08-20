@@ -16,7 +16,7 @@ class LigneCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["commande:write","commande:write:simple","commande:read:one"])]
+    #[Groups(["commande:read:all","commande:read:un","zone:read:one"])]
     private $id;
 
 
@@ -26,22 +26,41 @@ class LigneCommande
     private $commande;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:write","commande:read:simple","commande:write:simple","commande:read:one"])]
+    #[Groups(["commande:write","commande:read:simple","commande:read:un","commande:read:all",
+    "client-reed-one","zone:read:all","zone:read:one"])]
     #[Assert\NotBlank(message:"La quantite est Obligatoire")]
     private $quantite;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["commande:read:simple","commande:read:one"])]
+    #[Groups(["commande:write","commande:read:un","commande:read:one","commande:read:all",
+    "client-reed-one","zone:read:all","zone:read:one"])]
     private $prix;
 
-    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'ligneCommandes')]
-    #[Groups(["commande:write","commande:read:simple","commande:read:one"])]
+    #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)]
+    #[Groups(["commande:write","commande:read:simple","commande:read:un","commande:read:all",
+    "client-reed-one","zone:read:all","zone:read:one"])]
     private $produit;
+
+    // #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'ligneCommandes')]
+    // #[Groups(["commande:write","commande:read:one","client-reed-one","commande:read:all",
+    // "commande:read:un","commande:read:un"])]
+    // private $produits;
+
+   
+
+   
+
+    // #[ORM\OneToMany(mappedBy: 'ligneCommande', targetEntity: Produit::class)] 
+    // #[Groups(["commande:write","commande:read:one","client-reed-one","commande:read:all"])]
+    // private $produit;
 
 
     public function __construct()
     {
        
+       
+        $this->produits = new ArrayCollection();
+        $this->produit = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,17 +107,39 @@ class LigneCommande
         return $this;
     }
 
-    public function getProduit(): ?Produit
+    /**
+     * @return Collection<int, Produit>
+     */
+    public function getProduit(): Collection
     {
         return $this->produit;
     }
 
-    public function setProduit(?Produit $produit): self
+    public function addProduit(Produit $produit): self
     {
-        $this->produit = $produit;
+        if (!$this->produit->contains($produit)) {
+            $this->produit[] = $produit;
+            $produit->setLigneCommande($this);
+        }
 
         return $this;
     }
 
+    public function removeProduit(Produit $produit): self
+    {
+        if ($this->produit->removeElement($produit)) {
+            // set the owning side to null (unless already changed)
+            if ($produit->getLigneCommande() === $this) {
+                $produit->setLigneCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
+
+    
+    
 
 }

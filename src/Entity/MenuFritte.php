@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\MenuFritteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MenuFritteRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuFritteRepository::class)]
 class MenuFritte
@@ -14,12 +15,17 @@ class MenuFritte
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuFrittes')]
+    #[Groups(["menu:read:all","write_menu"])]
     private $menu;
 
     #[ORM\ManyToOne(targetEntity: FrittePortion::class, inversedBy: 'menuFrittes')]
+    #[Groups(["menu:read:all","write_menu","catalogue:read:all",
+    "menu:read:one","commande:read:all","client-reed-one"])]
     private $fritte;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(["menu:read:all","write_menu","catalogue:read:all",
+    "menu:read:one"])]
     private $quantite;
 
     public function getId(): ?int

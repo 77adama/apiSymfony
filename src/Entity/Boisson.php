@@ -14,13 +14,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations:[
 
         "post" => [
-            'denormalization_context' => ['groups' => ['write_boisson']],
+            'denormalization_context' => ['groups' => ['write_boissons']],
             // 'normalization_context' => ['groups' => ['produit:read:all']],
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
             "get" => [
-                'normalization_context' => ['groups' => ['produit:read:all']],
+                'normalization_context' => ['groups' => ['boisson:read:all']],
                 ],
             ],
             itemOperations:[
@@ -37,12 +37,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Boisson extends Produit
 {
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: MenuBoisson::class)]
+    #[Groups(["menu:read:al"])]
     private $menuBoissons;
 
+    #[ORM\ManyToMany(targetEntity: Taille::class, inversedBy: 'boissons')]
+    #[Groups(["menu:read:one","boisson:read:all","write_boissons"])]
+    private $tailles;
+
+   
+
+   
+
+   
+
+    
     public function __construct()
     {
         parent::__construct();
         $this->menuBoissons = new ArrayCollection();
+        $this->tailles = new ArrayCollection();
+       
+    
+        
     }
 
     /**
@@ -74,4 +90,31 @@ class Boisson extends Produit
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Taille>
+     */
+    public function getTailles(): Collection
+    {
+        return $this->tailles;
+    }
+
+    public function addTaille(Taille $taille): self
+    {
+        if (!$this->tailles->contains($taille)) {
+            $this->tailles[] = $taille;
+        }
+
+        return $this;
+    }
+
+    public function removeTaille(Taille $taille): self
+    {
+        $this->tailles->removeElement($taille);
+
+        return $this;
+    }
+
+    
+   
 }

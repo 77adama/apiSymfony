@@ -26,9 +26,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         // 'normalization_context' => ['groups' => ['user:read:simple']],
        
         // ],
-        // "post" => [
-        //     'normalization_context' => ['groups' => ['produit:read:all']],
-        //     ],
+         "post" => [
+            'normalization_context' => ['groups' => ['produit:read:all']],
+             ],
         "token" => [
             'method' => 'patch',
             "path"=>"user/validate/{token}",
@@ -43,12 +43,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["boisson:read:simple","fritte:read:simple"])]
+    #[Groups(["boisson:read:simple","fritte:read:simple","client-reed-one",
+    "livreur:read:all","livraison:read:all","livreur:read:un"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     // #[Groups(["produit:read:all","user:read:simple","produit:read:simple","write_"])]
-    #[Groups(["livraison:read:all","boisson:read:simple","fritte:read:simple"])]
+    #[Groups(["livraison:read:all","boisson:read:simple","fritte:read:simple","write_g","client-reed-one"
+    ,"commande:read:all","livreur:read:all","livreur:read:un","livreur:read:put"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
@@ -61,11 +63,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["livraison:read:all","write_"])]
+    #[Groups(["livraison:read:all","write_","write_g","client-reed-one","commande:read:all",
+    "zone:read:all","livreur:read:all","livreur:read:un"])]
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
-    // #[Groups(["produit:read:simple","write_"])]
+     #[Groups(["produit:read:simple","write_","write_g"])]
     protected $prenom;
 
     

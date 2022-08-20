@@ -58,7 +58,11 @@ class PersisterProduit implements ContextAwareDataPersisterInterface
             $this->prix-=$this->prix*0.05;
            $data->setPrix($this->prix);
         }
-       
+        
+if($data->getFakeImage()){
+    $data->setImage(file_get_contents($data->getFakeImage()));
+}
+dd($data->setImage);
            
             $this->entityManager->persist($data);
             $this->entityManager->flush();

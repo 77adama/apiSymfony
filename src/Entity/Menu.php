@@ -19,14 +19,18 @@ use Symfony\Component\Validator\Constraints as Assert;
     collectionOperations:[
 
         "post" => [
-            // 'denormalization_context' => ['groups' => ['write_menu']],
+             'denormalization_context' => ['groups' => ['write_menu']],
              'normalization_context' => ['groups' => ['produit:read:all']],
             "security"=>"is_granted('ROLE_GESTIONNAIRE')",
             "security_message"=>"Vous n'avez pas access à cette Ressource",
-            ],
-            "get" => [
+        ],
+        "get"=>[
+            'normalization_context' => ['groups' => ['menu:read:all']],
+        ],
+        "get" => [
+            //     'normalization_context' => ['groups' => ['produit:read:all']],
                 "path"=>"/menu2",
-                 'normalization_context' => ['groups' => ['produit:read:all']],
+                 'normalization_context' => ['groups' => ['menu:read:al']],
                 ],
                 "menu2" => [
                     'method' => 'Post',
@@ -41,20 +45,26 @@ use Symfony\Component\Validator\Constraints as Assert;
                 "security_message"=>"Vous n'avez pas access à cette Ressource",
             ],
             "get"=>[
-                // 'method' => 'get',
+                 'method' => 'get',
                 // 'status' => Response::HTTP_OK,
-               // 'normalization_context' => ['groups' => ['menu:read:simple']],
+                'normalization_context' => ['groups' => ['menu:read:one']],
                 ]]
 )]
 class Menu extends Produit
 {
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class,cascade:["persist"])]
+    #[Groups(["menu:read:all","write_menu","menu:read:al","catalogue:read:all",
+    "menu:read:one","commande:read:all","client-reed-one"])]
     private $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBoisson::class,cascade:["persist"])]
+    #[Groups(["menu:read:all","write_menu","catalogue:read:all","menu:read:al",
+    "menu:read:one","commande:read:all","client-reed-one"])]
     private $menuBoissons;
 
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuFritte::class,cascade:["persist"])]
+    #[Groups(["menu:read:all","write_menu","catalogue:read:all","menu:read:al",
+    "menu:read:one","commande:read:all","client-reed-one"])]
     private $menuFrittes;
 
     public function __construct()
